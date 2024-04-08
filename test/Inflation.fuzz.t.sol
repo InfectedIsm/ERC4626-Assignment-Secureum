@@ -11,7 +11,7 @@ import {SafeERC4626} from "../src/SafeERC4626.sol";
 import {VulnerableERC4626} from "../src/VulnerableERC4626.sol";
 
 
-contract VaultTest is Test {
+contract VaultTestFuzz is Test {
 
 	ERC4626 safeVault;
 	ERC4626 vulnerableVault;
