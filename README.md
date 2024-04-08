@@ -22,24 +22,15 @@ forge test -vv
 As required in the exercice, the vulnerable vault test should revert, as show by the output returned by the `forge test` command:
 
 ```shell
-Running 2 tests for test/Inflation.t.sol:VaultTest
-[PASS] test_Inflation_Safe() (gas: 618954)
-Logs:
-  attacker shares: 1e0
-  victim shares: 1e18
-  attacker assets: 1e0
-  victim assets: 1e0
+Ran 2 tests for test/Inflation.t.sol:VaultTest
+[PASS] test_Inflation_Safe() (gas: 616009)
 
-[FAIL. Reason: panic: arithmetic underflow or overflow (0x11)] test_Inflation_Vulnerable() (gas: 660083)
-Logs:
-  attacker shares: 1e0
-  victim shares: 0e0
+[FAIL. Reason: unexpected minted shares: 1000000000000000000 !~= 0 (max delta: 1, real delta: 1000000000000000000)] test_Inflation_Vulnerable() (gas: 624958)
+Suite result: FAILED. 1 passed; 1 failed; 0 skipped; finished in 2.83ms (2.78ms CPU time)
 
-Test result: FAILED. 1 passed; 1 failed; 0 skipped; finished in 3.76ms
-
-Ran 1 test suites: 1 tests passed, 1 failed, 0 skipped (2 total tests)
+Ran 1 test suite in 9.83ms (2.83ms CPU time): 1 tests passed, 1 failed, 0 skipped (2 total tests)
 
 Failing tests:
 Encountered 1 failing test in test/Inflation.t.sol:VaultTest
-[FAIL. Reason: panic: arithmetic underflow or overflow (0x11)] test_Inflation_Vulnerable() (gas: 660083)
+[FAIL. Reason: unexpected minted shares: 1000000000000000000 !~= 0 (max delta: 1, real delta: 1000000000000000000)] test_Inflation_Vulnerable() (gas: 624958)
 ```
