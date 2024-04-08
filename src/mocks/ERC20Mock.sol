@@ -12,5 +12,8 @@ contract ERC20Mock is ERC20 {
     uint8 _decimals = uint8(18);
     constructor() ERC20(_name, _symbol, _decimals) {}
 
+	function mint(address to, uint256 amount) external {
+		_mint(to, amount);
+	}
 
 }
