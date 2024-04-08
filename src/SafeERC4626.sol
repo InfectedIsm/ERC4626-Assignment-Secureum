@@ -37,11 +37,9 @@ contract SafeERC4626 is ERC4626 {
 
     function deposit(uint256 assets, address receiver) public override returns (uint256 shares) {
         // Check for rounding error since we round down in previewDeposit.
-        // require((shares = previewDeposit(assets)) != 0, "ZERO_SHARES");
-		shares = previewDeposit(assets);
+        require((shares = previewDeposit(assets)) != 0, "ZERO_SHARES");
         // Need to transfer before minting or ERC777s could reenter.
         asset.safeTransferFrom(msg.sender, address(this), assets);
-
         _mint(receiver, shares);
 
         emit Deposit(msg.sender, receiver, assets, shares);
@@ -61,8 +59,7 @@ contract SafeERC4626 is ERC4626 {
             if (allowed != type(uint256).max) allowance[owner][msg.sender] = allowed - shares;
         }
         // Check for rounding error since we round down in previewRedeem.
-        // require((assets = previewRedeem(shares)) != 0, "ZERO_ASSETS");
-		assets = previewRedeem(shares);
+        require((assets = previewRedeem(shares)) != 0, "ZERO_ASSETS");
         beforeWithdraw(assets, shares);
 		underlyingBalance[receiver] -= assets;
 

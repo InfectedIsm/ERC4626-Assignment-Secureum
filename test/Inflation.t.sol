@@ -1,7 +1,7 @@
 ///SPDX-License-Identifier: Unlicensed
 pragma solidity 0.8.21;
 
-import {Test, console} from "forge-std/Test.sol";
+import {Test, console, StdAssertions} from "forge-std/Test.sol";
 
 import {ERC4626} from "../lib/solmate/src/tokens/ERC4626.sol";
 import {ERC20} from "../lib/solmate/src/tokens/ERC20.sol";
@@ -32,6 +32,8 @@ contract VaultTest is Test {
 		underlyingAsset = vault.asset();
 		uint256 victimBalance = 1e18;
 		uint256 attackerBalance = 1 + 1e18;
+
+		uint expectedVictimShares = vault.previewDeposit(victimBalance);
 		
 		deal(address(underlyingAsset), victim, victimBalance);
 		deal(address(underlyingAsset), attacker, attackerBalance);
@@ -48,14 +50,17 @@ contract VaultTest is Test {
 		//victim then deposit its balance
 		vm.prank(victim); vault.deposit(victimBalance, victim);
 
-		console.log("attacker shares: %e", vault.balanceOf(attacker));
-		console.log("victim shares: %e", vault.balanceOf(victim));
+		uint256 attackerShares =  vault.balanceOf(attacker);
+		uint256 victimShares =  vault.balanceOf(victim);
+		//victim should get the expected shares calculated before the inflation attack +-1 because of rounding
+		assertApproxEqAbs(expectedVictimShares, victimShares, 1, "unexpected minted shares");
 
 		//finally, attacker withdraw its shares
-		vm.prank(attacker); vault.redeem(1, attacker, attacker);
-		vm.prank(victim); vault.redeem(1, victim, victim);
-		console.log("attacker assets: %e", underlyingAsset.balanceOf(attacker));
-		console.log("victim assets: %e", underlyingAsset.balanceOf(victim));
+		vm.prank(attacker); vault.redeem(attackerShares, attacker, attacker);
+		vm.prank(victim); vault.redeem(victimShares, victim, victim);
+
+		uint256 finalVictimBalance = underlyingAsset.balanceOf(victim);
+		assertApproxEqAbs(finalVictimBalance, victimBalance, 1, "unexpected withdrawn assets");
 	}
 
 	function test_Inflation_Vulnerable() public {
@@ -63,6 +68,8 @@ contract VaultTest is Test {
 		underlyingAsset = vault.asset();
 		uint256 victimBalance = 1e18;
 		uint256 attackerBalance = 1 + 1e18;
+
+		uint expectedVictimShares = vault.previewDeposit(victimBalance);
 		
 		deal(address(underlyingAsset), victim, victimBalance);
 		deal(address(underlyingAsset), attacker, attackerBalance);
@@ -79,14 +86,17 @@ contract VaultTest is Test {
 		//victim then deposit its balance
 		vm.prank(victim); vault.deposit(victimBalance, victim);
 
-		console.log("attacker shares: %e", vault.balanceOf(attacker));
-		console.log("victim shares: %e", vault.balanceOf(victim));
+		uint256 attackerShares =  vault.balanceOf(attacker);
+		uint256 victimShares =  vault.balanceOf(victim);
+		//victim should get the expected shares calculated before the inflation attack +-1 because of rounding
+		assertApproxEqAbs(expectedVictimShares, victimShares, 1, "unexpected minted shares");
 
 		//finally, attacker withdraw its shares
-		vm.prank(attacker); vault.redeem(1, attacker, attacker);
-		vm.prank(victim); vault.redeem(1, victim, victim);
-		console.log("attacker assets: %e", underlyingAsset.balanceOf(attacker));
-		console.log("victim assets: %e", underlyingAsset.balanceOf(victim));
+		vm.prank(attacker); vault.redeem(attackerShares, attacker, attacker);
+		vm.prank(victim); vault.redeem(victimShares, victim, victim);
+
+		uint256 finalVictimBalance = underlyingAsset.balanceOf(victim);
+		assertApproxEqAbs(finalVictimBalance, victimBalance, 1, "unexpected withdrawn assets");
 	}
 
 }
