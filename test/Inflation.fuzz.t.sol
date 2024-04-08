@@ -27,11 +27,13 @@ contract VaultTest is Test {
 		attacker = makeAddr("attacker");
 	}
 
-	function test_Inflation_Safe() public {
+	function test_Inflation_Safe_Fuzz(uint256 depositBalance) public {
+		depositBalance = bound(depositBalance, 1, type(uint128).max -1);
+
 		ERC4626 vault = safeVault;
 		underlyingAsset = vault.asset();
-		uint256 victimBalance = 1e18;
-		uint256 attackerBalance = 1 + 1e18;
+		uint256 victimBalance = depositBalance;
+		uint256 attackerBalance = 1 + depositBalance;
 
 		uint expectedVictimShares = vault.previewDeposit(victimBalance);
 		
@@ -63,11 +65,13 @@ contract VaultTest is Test {
 		assertApproxEqAbs(finalVictimBalance, victimBalance, 1, "unexpected withdrawn assets");
 	}
 
-	function test_Inflation_Vulnerable() public {
+	function test_Inflation_Vulnerable_Fuzz(uint256 depositBalance) public {
+		depositBalance = bound(depositBalance, 1, type(uint128).max -1);
+		
 		ERC4626 vault = vulnerableVault;
 		underlyingAsset = vault.asset();
-		uint256 victimBalance = 1e18;
-		uint256 attackerBalance = 1 + 1e18;
+		uint256 victimBalance = depositBalance;
+		uint256 attackerBalance = 1 + depositBalance;
 
 		uint expectedVictimShares = vault.previewDeposit(victimBalance);
 		
