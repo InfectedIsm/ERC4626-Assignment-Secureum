@@ -8,7 +8,7 @@ import {ERC20Mock} from "./mocks/ERC20Mock.sol";
 
 contract SafeVault is ERC4626 {
 
-	ERC20 _asset = new ERC20Mock("Token", "TKN", uint8(18));
+	ERC20 _asset = new ERC20Mock();
 	string _name = "VaultToken";
 	string _symbol = "VTKN";
 
